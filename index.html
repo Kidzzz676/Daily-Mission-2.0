@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mission Possible</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      max-width: 480px;
+      margin: auto;
+      background: #f4f6f9;
+      padding: 10px;
+    }
+
+    h2 { text-align: center; }
+
+    .card {
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      margin: 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin: 3px;
+      cursor: pointer;
+    }
+
+    .primary { background: #4CAF50; color: white; }
+    .danger { background: #ff4d4f; color: white; }
+
+    .activity {
+      display: flex;
+      align-items: center;
+      padding: 6px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .activity:last-child { border-bottom: none; }
+
+    .activity label { margin-left: 10px; }
+
+    .activity .delete-btn {
+      margin-left: auto;
+      background: transparent;
+      color: #ff4d4f;
+      border: none;
+      font-size: 14px;
+      padding: 2px 6px;
+      opacity: 0;
+      transition: 0.2s;
+    }
+
+    .activity:hover .delete-btn {
+      opacity: 1;
+    }
+
+    .progress-container {
+      height: 20px;
+      background: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      color: white;
+      text-align: center;
+      font-size: 12px;
+      line-height: 20px;
+    }
+
+    .week-box {
+      background: white;
+      border-radius: 12px;
+      padding: 10px;
+      margin: 10px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    body.dark {
+      background: #121212;
+      color: white;
+    }
+
+    body.dark .card,
+    body.dark .week-box {
+      background: #1e1e1e;
+    }
+
+    body.dark .progress-container {
+      background: #333;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Mission Possible 🚀</h2>
+
+<button id="darkModeBtn">🌙 Dark Mode</button>
+
+<div class="card">
+  <select id="projectSelect"></select>
+  <button id="renameProject">Rename</button>
+  <button id="deleteProject" class="danger">Delete</button><br>
+  <input id="newProject" placeholder="Project baru">
+  <button id="addProject" class="primary">Tambah</button>
+</div>
+
+<div class="card">
+  <button id="prevDay">◀</button>
+  <span id="dayLabel"></span>
+  <button id="nextDay">▶</button>
+</div>
+
+<div class="card">
+  <input id="newActivity" placeholder="Tambah aktivitas">
+  <button id="addActivity" class="primary">Tambah</button>
+</div>
+
+<div class="card" id="activities"></div>
+
+<div class="card">
+  <div class="progress-container">
+    <div id="progressBar" class="progress-bar">0%</div>
+  </div>
+  <p id="targetText"></p>
+</div>
+
+<!-- DAILY CHART -->
+<div class="card">
+  <canvas id="progressChart"></canvas>
+</div>
+
+<div class="card">
+  <button id="showDashboard">📊 Dashboard</button>
+  <button id="newWeek">🆕 New Week</button>
+  <button id="resetLog">Reset</button>
+  <button id="exportCSV">📥 Export CSV</button>
+</div>
+
+<div id="weeklyContainer" style="display:none;"></div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+let chart;
+let weeklyCharts = {};
+
+let projects = JSON.parse(localStorage.getItem('projects')) || ["General"];
+let currentProject = localStorage.getItem('currentProject') || projects[0];
+
+let activitiesPerProject = JSON.parse(localStorage.getItem('activitiesPerProject')) || {
+  "General": ["Olahraga","Baca Buku"]
+};
+
+let savedData = JSON.parse(localStorage.getItem('dailyTracker')) || {};
+let weeklyLog = JSON.parse(localStorage.getItem('weeklyLog')) || [];
+let currentDay = parseInt(localStorage.getItem('currentDay')) || 1;
+
+const projectSelect = document.getElementById('projectSelect');
+const activitiesDiv = document.getElementById('activities');
+const progressBar = document.getElementById('progressBar');
+const dayLabel = document.getElementById('dayLabel');
+const targetText = document.getElementById('targetText');
+const weeklyContainer = document.getElementById('weeklyContainer');
+
+function saveAll(){
+  localStorage.setItem('projects',JSON.stringify(projects));
+  localStorage.setItem('currentProject',currentProject);
+  localStorage.setItem('activitiesPerProject',JSON.stringify(activitiesPerProject));
+  localStorage.setItem('dailyTracker',JSON.stringify(savedData));
+  localStorage.setItem('weeklyLog',JSON.stringify(weeklyLog));
+}
+
+function getKey(day, act){
+  return `${currentProject}-${day}-${act}`;
+}
+
+function renderProjects(){
+  projectSelect.innerHTML="";
+  projects.forEach(p=>{
+    let opt=document.createElement('option');
+    opt.value=p;
+    opt.textContent=p;
+    projectSelect.appendChild(opt);
+  });
+  projectSelect.value=currentProject;
+}
+
+function renderDay(){
+  let list = activitiesPerProject[currentProject] || [];
+
+  activitiesDiv.innerHTML="";
+  dayLabel.textContent = currentProject + " - Day " + currentDay;
+
+  list.forEach(act=>{
+    let div=document.createElement('div');
+    div.className='activity';
+
+    let cb=document.createElement('input');
+    cb.type='checkbox';
+    cb.checked = savedData[getKey(currentDay,act)] || false;
+
+    cb.onchange=()=>{
+      savedData[getKey(currentDay,act)] = cb.checked;
+      saveAll();
+      updateProgress();
+      updateChart();
+    };
+
+    let label=document.createElement('label');
+    label.textContent=act;
+
+    let del=document.createElement('button');
+    del.textContent="✖";
+    del.className="delete-btn";
+    del.onclick=()=>{
+      activitiesPerProject[currentProject] =
+        list.filter(a=>a!==act);
+      saveAll();
+      renderDay();
+    };
+
+    div.append(cb,label,del);
+    activitiesDiv.appendChild(div);
+  });
+
+  updateProgress();
+  updateChart();
+}
+
+function updateProgress(){
+  let list = activitiesPerProject[currentProject] || [];
+  let done=0;
+
+  list.forEach(a=>{
+    if(savedData[getKey(currentDay,a)]) done++;
+  });
+
+  let percent = list.length ? Math.round(done/list.length*100) : 0;
+
+  progressBar.style.width=percent+"%";
+  progressBar.textContent=percent+"%";
+  progressBar.style.background =
+    percent<50?'#ff4d4f':
+    percent<80?'#faad14':'#52c41a';
+
+  targetText.textContent =
+    percent>=80 ? "🔥 Target tercapai!" : "💪 Kejar 80%";
+}
+
+function updateChart(){
+  let list = activitiesPerProject[currentProject] || [];
+  let data = [];
+
+  for(let d=1; d<=7; d++){
+    let done=0;
+
+    list.forEach(a=>{
+      if(savedData[`${currentProject}-${d}-${a}`]) done++;
+    });
+
+    let percent = list.length ? Math.round(done/list.length*100) : 0;
+    data.push(percent);
+  }
+
+  if(chart) chart.destroy();
+
+  chart = new Chart(document.getElementById('progressChart'), {
+    type: 'line',
+    data: {
+      labels: ["D1","D2","D3","D4","D5","D6","D7"],
+      datasets: [{
+        label: currentProject,
+        data: data,
+        borderColor: "#4CAF50",
+        backgroundColor: "#4CAF50",
+        tension: 0.3
+      }]
+    }
+  });
+}
+
+/* 🔥 UPDATED: MULTI COLOR PER PROJECT */
+function renderWeeklyChart(week){
+
+  const colors = [
+    "#4CAF50",
+    "#2196F3",
+    "#FF9800",
+    "#9C27B0",
+    "#F44336",
+    "#00BCD4",
+    "#FFC107"
+  ];
+
+  let datasets = [];
+  let index = 0;
+
+  Object.keys(week.projects).forEach(project => {
+    let p = week.projects[project];
+    let data = [];
+
+    for(let d=1; d<=7; d++){
+      let total=0, done=0;
+
+      p.activities.forEach(a=>{
+        total++;
+        if(p.data["Day "+d][a]) done++;
+      });
+
+      let percent = total ? Math.round(done/total*100) : 0;
+      data.push(percent);
+    }
+
+    datasets.push({
+      label: project,
+      data: data,
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length],
+      tension: 0.3
+    });
+
+    index++;
+  });
+
+  let ctx = document.getElementById(`chart-week-${week.week}`);
+
+  if(weeklyCharts[week.week]){
+    weeklyCharts[week.week].destroy();
+  }
+
+  weeklyCharts[week.week] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["D1","D2","D3","D4","D5","D6","D7"],
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          display: true
+        }
+      }
+    }
+  });
+}
+
+function saveWeek(){
+  if(weeklyLog.length === 0){
+    weeklyLog.push({ week:1, projects:{} });
+  }
+
+  let weekData = weeklyLog[weeklyLog.length - 1];
+  let list = activitiesPerProject[currentProject] || [];
+
+  let projectData = {};
+
+  for(let d=1; d<=7; d++){
+    projectData["Day "+d]={};
+    list.forEach(a=>{
+      projectData["Day "+d][a] = savedData[getKey(d,a)] || false;
+    });
+  }
+
+  weekData.projects[currentProject] = {
+    activities:[...list],
+    data:projectData
+  };
+
+  list.forEach(a=>{
+    for(let d=1; d<=7; d++){
+      delete savedData[getKey(d,a)];
+    }
+  });
+
+  saveAll();
+}
+
+function renderDashboard(){
+  weeklyContainer.innerHTML="<h3>Dashboard Mingguan</h3>";
+
+  if(weeklyLog.length===0){
+    weeklyContainer.innerHTML+="<p>Belum ada data</p>";
+    return;
+  }
+
+  weeklyLog.forEach(w=>{
+    let box=document.createElement('div');
+    box.className="week-box";
+
+    box.innerHTML=`<h4>Minggu ${w.week}</h4>
+    <canvas id="chart-week-${w.week}"></canvas>`;
+
+    Object.keys(w.projects).forEach(project=>{
+      let p=w.projects[project];
+
+      let total=0,done=0;
+      p.activities.forEach(a=>{
+        for(let d=1;d<=7;d++){
+          total++;
+          if(p.data["Day "+d][a]) done++;
+        }
+      });
+
+      let percent= total?Math.round(done/total*100):0;
+
+      box.innerHTML+=`<b>${project}</b> - ${percent}%<br>`;
+    });
+
+    weeklyContainer.appendChild(box);
+
+    renderWeeklyChart(w);
+  });
+}
+
+document.getElementById('exportCSV').onclick=()=>{
+  let csv="Minggu,Project,Hari,Activity,Status\n";
+
+  weeklyLog.forEach(w=>{
+    Object.keys(w.projects).forEach(project=>{
+      let p=w.projects[project];
+
+      p.activities.forEach(a=>{
+        for(let d=1;d<=7;d++){
+          let status=p.data["Day "+d][a]?"Done":"Not Done";
+          csv+=`Minggu ${w.week},${project},Day ${d},${a},${status}\n`;
+        }
+      });
+    });
+  });
+
+  let link=document.createElement("a");
+  link.href=encodeURI("data:text/csv;charset=utf-8,"+csv);
+  link.download="habit_tracker.csv";
+  link.click();
+};
+
+document.getElementById('addProject').onclick=()=>{
+  let val=newProject.value.trim();
+  if(val&&!projects.includes(val)){
+    projects.push(val);
+    currentProject=val;
+    activitiesPerProject[val]=[];
+    saveAll();
+    renderProjects();
+    renderDay();
+  }
+};
+
+projectSelect.onchange=()=>{
+  currentProject=projectSelect.value;
+  saveAll();
+  renderDay();
+};
+
+document.getElementById('addActivity').onclick=()=>{
+  let val=newActivity.value.trim();
+  if(val){
+    activitiesPerProject[currentProject].push(val);
+    saveAll();
+    renderDay();
+  }
+};
+
+prevDay.onclick=()=>{
+  currentDay=(currentDay-2+7)%7+1;
+  localStorage.setItem('currentDay',currentDay);
+  renderDay();
+};
+
+nextDay.onclick=()=>{
+  if(currentDay===7){
+    saveWeek();
+    alert("Minggu selesai!");
+    currentDay=1;
+  } else currentDay++;
+  localStorage.setItem('currentDay',currentDay);
+  renderDay();
+};
+
+showDashboard.onclick=()=>{
+  weeklyContainer.style.display =
+    weeklyContainer.style.display==='none'?'block':'none';
+  renderDashboard();
+};
+
+newWeek.onclick=()=>{
+  weeklyLog.push({week:weeklyLog.length+1,projects:{}});
+  saveAll();
+  alert("Minggu baru!");
+};
+
+resetLog.onclick=()=>{
+  weeklyLog=[];
+  localStorage.removeItem('weeklyLog');
+  renderDashboard();
+};
+
+darkModeBtn.onclick=()=>{
+  document.body.classList.toggle('dark');
+};
+
+renderProjects();
+renderDay();
+
+});
+</script>
+
+</body>
+</html>
