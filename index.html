@@ -7,133 +7,147 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      max-width: 600px;
-      margin: auto;
-      background: linear-gradient(180deg, #f4f6f9, #e9eef5);
-      padding: 12px;
-      padding-top: env(safe-area-inset-top);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
+/* ===== GLOBAL ===== */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.2px;
 
-    h2 { text-align: center; }
+  max-width: 600px;
+  margin: auto;
 
-    .card {
-      background: white;
-      padding: 12px;
-      border-radius: 12px;
-      margin: 10px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      display: flex;
-      flex-direction: column;
-    }
+  background: linear-gradient(180deg, #eef2f7, #e3eaf3);
+  padding: 14px;
+}
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin: 3px;
-      cursor: pointer;
-    }
+h2 {
+  text-align: center;
+  font-weight: 700;
+  font-size: 22px;
+}
 
-    .card button {
-      margin-top: 5px;
-    }
+/* ===== CARD ===== */
+.card {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(10px);
+  padding: 14px;
+  border-radius: 16px;
+  margin: 12px 0;
 
-    .primary { background: #4CAF50; color: white; }
-    .danger { background: #ff4d4f; color: white; }
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 
-    .activity {
-      display: flex;
-      align-items: center;
-      padding: 6px;
-      border-bottom: 1px solid #eee;
-      font-size: 15px;
-    }
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
 
-    .activity:last-child { border-bottom: none; }
+/* ===== BUTTON ===== */
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  transition: 0.15s;
+}
 
-    .activity label { margin-left: 10px; }
+button:active {
+  transform: scale(0.95);
+}
 
-    .activity .delete-btn {
-      margin-left: auto;
-      background: transparent;
-      color: #ff4d4f;
-      border: none;
-      font-size: 14px;
-      padding: 2px 6px;
-      opacity: 0;
-      transition: 0.2s;
-    }
+.primary {
+  background: linear-gradient(135deg, #4CAF50, #43A047);
+  color: white;
+}
 
-    .activity:hover .delete-btn {
-      opacity: 1;
-    }
+.danger {
+  background: linear-gradient(135deg, #ff4d4f, #d9363e);
+  color: white;
+}
 
-    .progress-container {
-      height: 20px;
-      background: #eee;
-      border-radius: 10px;
-      overflow: hidden;
-    }
+button:not(.primary):not(.danger) {
+  background: #f0f2f5;
+}
 
-    .progress-bar {
-      height: 100%;
-      color: white;
-      text-align: center;
-      font-size: 12px;
-      line-height: 20px;
-    }
+/* ===== INPUT ===== */
+input, select {
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+}
 
-    canvas {
-      max-height: 250px;
-    }
+/* ===== ACTIVITY ===== */
+.activity {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 12px;
+}
 
-    .week-box {
-      background: white;
-      border-radius: 12px;
-      padding: 10px;
-      margin: 10px 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
+.activity:hover {
+  background: rgba(0,0,0,0.03);
+}
 
-    body.dark {
-      background: #121212;
-      color: white;
-    }
+.activity input {
+  transform: scale(1.2);
+}
 
-    body.dark .card,
-    body.dark .week-box {
-      background: #1e1e1e;
-    }
+.activity label {
+  margin-left: 12px;
+}
 
-    body.dark .progress-container {
-      background: #333;
-    }
+.activity input:checked + label {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
 
-    /* 📱 iPhone XR & larger phones */
-    @media (min-width: 414px) {
-      body {
-        max-width: 600px;
-      }
+.delete-btn {
+  margin-left: auto;
+  opacity: 0;
+}
 
-      .card {
-        padding: 16px;
-      }
+.activity:hover .delete-btn {
+  opacity: 1;
+}
 
-      button {
-        padding: 10px 14px;
-        font-size: 15px;
-      }
+/* ===== PROGRESS ===== */
+.progress-container {
+  height: 22px;
+  background: #e5e7eb;
+  border-radius: 12px;
+}
 
-      .activity {
-        padding: 10px;
-        font-size: 16px;
-      }
-    }
+.progress-bar {
+  height: 100%;
+  text-align: center;
+  color: white;
+  font-size: 13px;
+}
+
+/* ===== DARK MODE ===== */
+body.dark {
+  background: #121212;
+  color: white;
+}
+
+body.dark .card {
+  background: rgba(30,30,30,0.9);
+}
+
+body.dark input {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark .progress-container {
+  background: #333;
+}
   </style>
 </head>
+
 <body>
 
 <h2>Mission Possible 🚀</h2>
@@ -143,7 +157,7 @@
 <div class="card">
   <select id="projectSelect"></select>
   <button id="renameProject">Rename</button>
-  <button id="deleteProject" class="danger">Delete</button><br>
+  <button id="deleteProject" class="danger">Delete</button>
   <input id="newProject" placeholder="Project baru">
   <button id="addProject" class="primary">Tambah</button>
 </div>
@@ -296,7 +310,6 @@ function updateChart(){
 
   for(let d=1; d<=7; d++){
     let done=0;
-
     list.forEach(a=>{
       if(savedData[`${currentProject}-${d}-${a}`]) done++;
     });
@@ -315,154 +328,25 @@ function updateChart(){
         label: currentProject,
         data: data,
         borderColor: "#4CAF50",
-        backgroundColor: "#4CAF50",
         tension: 0.3
       }]
     }
   });
 }
 
-function renderWeeklyChart(week){
-
-  const colors = [
-    "#4CAF50","#2196F3","#FF9800","#9C27B0",
-    "#F44336","#00BCD4","#FFC107"
-  ];
-
-  let datasets = [];
-  let index = 0;
-
-  Object.keys(week.projects).forEach(project => {
-    let p = week.projects[project];
-    let data = [];
-
-    for(let d=1; d<=7; d++){
-      let total=0, done=0;
-
-      p.activities.forEach(a=>{
-        total++;
-        if(p.data["Day "+d][a]) done++;
-      });
-
-      let percent = total ? Math.round(done/total*100) : 0;
-      data.push(percent);
-    }
-
-    datasets.push({
-      label: project,
-      data: data,
-      borderColor: colors[index % colors.length],
-      backgroundColor: colors[index % colors.length],
-      tension: 0.3
-    });
-
-    index++;
-  });
-
-  let ctx = document.getElementById(`chart-week-${week.week}`);
-
-  if(weeklyCharts[week.week]){
-    weeklyCharts[week.week].destroy();
-  }
-
-  weeklyCharts[week.week] = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ["D1","D2","D3","D4","D5","D6","D7"],
-      datasets: datasets
-    }
-  });
-}
-
-function saveWeek(){
-  if(weeklyLog.length === 0){
-    weeklyLog.push({ week:1, projects:{} });
-  }
-
-  let weekData = weeklyLog[weeklyLog.length - 1];
-  let list = activitiesPerProject[currentProject] || [];
-
-  let projectData = {};
-
-  for(let d=1; d<=7; d++){
-    projectData["Day "+d]={};
-    list.forEach(a=>{
-      projectData["Day "+d][a] = savedData[getKey(d,a)] || false;
-    });
-  }
-
-  weekData.projects[currentProject] = {
-    activities:[...list],
-    data:projectData
-  };
-
-  list.forEach(a=>{
-    for(let d=1; d<=7; d++){
-      delete savedData[getKey(d,a)];
-    }
-  });
-
-  saveAll();
-}
-
 function renderDashboard(){
   weeklyContainer.innerHTML="<h3>Dashboard Mingguan</h3>";
 
-  if(weeklyLog.length===0){
-    weeklyContainer.innerHTML+="<p>Belum ada data</p>";
-    return;
-  }
-
   weeklyLog.forEach(w=>{
     let box=document.createElement('div');
-    box.className="week-box";
+    box.className="card";
 
     box.innerHTML=`<h4>Minggu ${w.week}</h4>
-    <canvas id="chart-week-${w.week}"></canvas>`;
-
-    Object.keys(w.projects).forEach(project=>{
-      let p=w.projects[project];
-
-      let total=0,done=0;
-      p.activities.forEach(a=>{
-        for(let d=1;d<=7;d++){
-          total++;
-          if(p.data["Day "+d][a]) done++;
-        }
-      });
-
-      let percent= total?Math.round(done/total*100):0;
-
-      box.innerHTML+=`<b>${project}</b> - ${percent}%<br>`;
-    });
+    <canvas id="chart-${w.week}"></canvas>`;
 
     weeklyContainer.appendChild(box);
-
-    renderWeeklyChart(w);
   });
 }
-
-document.getElementById('exportCSV').onclick=()=>{
-  let csv="Minggu,Project,Hari,Activity,Status\n";
-
-  weeklyLog.forEach(w=>{
-    Object.keys(w.projects).forEach(project=>{
-      let p=w.projects[project];
-
-      p.activities.forEach(a=>{
-        for(let d=1;d<=7;d++){
-          let status=p.data["Day "+d][a]?"Done":"Not Done";
-          csv+=`Minggu ${w.week},${project},Day ${d},${a},${status}\n`;
-        }
-      });
-    });
-  });
-
-  let link=document.createElement("a");
-  link.href=encodeURI("data:text/csv;charset=utf-8,"+csv);
-  link.download="habit_tracker.csv";
-  link.click();
-};
 
 document.getElementById('addProject').onclick=()=>{
   let val=newProject.value.trim();
@@ -470,6 +354,33 @@ document.getElementById('addProject').onclick=()=>{
     projects.push(val);
     currentProject=val;
     activitiesPerProject[val]=[];
+    saveAll();
+    renderProjects();
+    renderDay();
+  }
+};
+
+document.getElementById('renameProject').onclick=()=>{
+  let newName=prompt("Rename project:", currentProject);
+  if(newName){
+    activitiesPerProject[newName]=activitiesPerProject[currentProject];
+    delete activitiesPerProject[currentProject];
+
+    projects = projects.map(p=>p===currentProject?newName:p);
+    currentProject=newName;
+
+    saveAll();
+    renderProjects();
+    renderDay();
+  }
+};
+
+document.getElementById('deleteProject').onclick=()=>{
+  if(confirm("Hapus project?")){
+    projects = projects.filter(p=>p!==currentProject);
+    delete activitiesPerProject[currentProject];
+    currentProject=projects[0]||"General";
+
     saveAll();
     renderProjects();
     renderDay();
@@ -499,30 +410,11 @@ prevDay.onclick=()=>{
 
 nextDay.onclick=()=>{
   if(currentDay===7){
-    saveWeek();
     alert("Minggu selesai!");
     currentDay=1;
   } else currentDay++;
   localStorage.setItem('currentDay',currentDay);
   renderDay();
-};
-
-showDashboard.onclick=()=>{
-  weeklyContainer.style.display =
-    weeklyContainer.style.display==='none'?'block':'none';
-  renderDashboard();
-};
-
-newWeek.onclick=()=>{
-  weeklyLog.push({week:weeklyLog.length+1,projects:{}});
-  saveAll();
-  alert("Minggu baru!");
-};
-
-resetLog.onclick=()=>{
-  weeklyLog=[];
-  localStorage.removeItem('weeklyLog');
-  renderDashboard();
 };
 
 darkModeBtn.onclick=()=>{
