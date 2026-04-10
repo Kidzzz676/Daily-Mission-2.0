@@ -528,6 +528,83 @@ resetLog.onclick=()=>{
 darkModeBtn.onclick=()=>{
   document.body.classList.toggle('dark');
 };
+document.getElementById('renameProject').onclick = () => {
+  let newName = prompt("Masukkan nama baru project:", currentProject);
+
+  if (!newName || newName.trim() === "" || newName === currentProject) return;
+
+  if (projects.includes(newName)) {
+    alert("Nama project sudah ada!");
+    return;
+  }
+
+  // 🔁 Update projects list
+  projects = projects.map(p => p === currentProject ? newName : p);
+
+  // 🔁 Update activities
+  activitiesPerProject[newName] = activitiesPerProject[currentProject];
+  delete activitiesPerProject[currentProject];
+
+  // 🔁 Update savedData (INI KRUSIAL)
+  let newSavedData = {};
+  Object.keys(savedData).forEach(key => {
+    if (key.startsWith(currentProject + "-")) {
+      let newKey = key.replace(currentProject + "-", newName + "-");
+      newSavedData[newKey] = savedData[key];
+    } else {
+      newSavedData[key] = savedData[key];
+    }
+  });
+  savedData = newSavedData;
+
+  // 🔁 Update weeklyLog
+  weeklyLog.forEach(week => {
+    if (week.projects[currentProject]) {
+      week.projects[newName] = week.projects[currentProject];
+      delete week.projects[currentProject];
+    }
+  });
+
+  // set current
+  currentProject = newName;
+
+  saveAll();
+  renderProjects();
+  renderDay();
+};
+document.getElementById('deleteProject').onclick = () => {
+  if (projects.length === 1) {
+    alert("Minimal harus ada 1 project!");
+    return;
+  }
+
+  if (!confirm(`Hapus project "${currentProject}"?`)) return;
+
+  // ❌ Hapus dari projects
+  projects = projects.filter(p => p !== currentProject);
+
+  // ❌ Hapus activities
+  delete activitiesPerProject[currentProject];
+
+  // ❌ Hapus savedData
+  Object.keys(savedData).forEach(key => {
+    if (key.startsWith(currentProject + "-")) {
+      delete savedData[key];
+    }
+  });
+
+  // ❌ Hapus dari weeklyLog
+  weeklyLog.forEach(week => {
+    delete week.projects[currentProject];
+  });
+
+  // pindah ke project pertama
+  currentProject = projects[0];
+
+  saveAll();
+  renderProjects();
+  renderDay();
+};
 
 renderProjects();
 renderDay();
