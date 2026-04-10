@@ -484,7 +484,8 @@ projectSelect.onchange=()=>{
 
 document.getElementById('addActivity').onclick=()=>{
   let val=newActivity.value.trim();
-  if(val){
+
+  if(val && !activitiesPerProject[currentProject].includes(val)){
     activitiesPerProject[currentProject].push(val);
     saveAll();
     renderDay();
