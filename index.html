@@ -3,10 +3,239 @@
 <head>
   <title>Mission Possible</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    
+    /* Container Menu Utama */
+.card-menu {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Membagi menjadi 2 kolom agar lebih ringkas */
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.4) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 24px;
+  padding: 20px;
+}
+
+/* Base Style Tombol Menu */
+.menu-btn {
+  display: flex;
+  flex-direction: column; /* Ikon di atas, teks di bawah */
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+  border-radius: 18px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  background: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+/* Efek Hover: Tombol sedikit membesar dan bercahaya */
+.menu-btn:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
+  background: #fdfdfd;
+}
+
+/* Memberikan warna ikon yang berbeda secara halus */
+.menu-btn i {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+/* Tombol Reset (Warna Merah Halus) */
+#resetLog {
+  background: #fff1f0;
+  color: #ff4d4f;
+}
+
+#resetLog:hover {
+  background: #ff4d4f;
+  color: white;
+}
+
+/* Tombol Dashboard (Warna Hijau/Biru) */
+#showDashboard {
+  background: #f6ffed;
+  color: #52c41a;
+}
+    
+    :root {
+  --primary-glow: #52c41a;
+  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+}
+
+body {
+  background: var(--bg-gradient);
+  min-height: 100vh;
+  color: #2d3436;
+  backdrop-filter: blur(10px);
+}
+
+/* Glassmorphism Card Effect */
+.card, .project-header, .nav-row, .week-box {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07) !important;
+  border-radius: 20px !important;
+}
+
+/* Futuristik Progress Bar */
+.progress-container {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+  border-radius: 20px;
+  background: linear-gradient(90deg, #52c41a, #b7eb8f) !important;
+  box-shadow: 0 0 15px rgba(82, 196, 26, 0.4);
+  transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Hover Effects untuk Tombol */
+button {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Styling Checkbox Futuristik */
+input[type="checkbox"] {
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #52c41a;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  transition: 0.3s;
+}
+
+input[type="checkbox"]:checked {
+  background: #52c41a;
+  box-shadow: 0 0 10px rgba(82, 196, 26, 0.5);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✔';
+  position: absolute;
+  color: white;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+        
+    /* Memberikan efek bayangan lembut pada kontainer grafik */
+.card:has(canvas) {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  border-radius: 16px;
+  overflow: hidden; /* Agar gradien tidak keluar dari border-radius */
+}
+    
+    /* --- Project Action Row (Simple & Space Saving) --- */
+.project-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+#projectSelect {
+  flex-grow: 1; /* Supaya dropdown mengambil ruang sisa */
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.btn-rename { background: #f0f2f5; color: #555; }
+.btn-delete { background: #fff1f0; color: #ff4d4f; }
+
+/* Dark Mode */
+body.dark .project-header { background: #1e1e1e; }
+body.dark #projectSelect { background: #333; color: white; border-color: #444; }
+body.dark .btn-rename { background: #333; color: #ccc; }
+body.dark .btn-delete { background: #431414; color: #ff7875; }    
+    
+    /* --- Navigasi Hari yang Lebih Simpel & Futuristik --- */
+.nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  padding: 10px 15px;
+  border-radius: 15px;
+  margin: 10px 0;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.nav-btn-sm {
+  background: #f0f2f5;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #4CAF50;
+  font-size: 18px;
+}
+
+.nav-btn-sm:hover {
+  background: #4CAF50;
+  color: white;
+  transform: scale(1.1);
+}
+
+#dayLabel {
+  font-weight: bold;
+  font-size: 15px;
+  color: #444;
+}
+
+/* Penyesuaian Dark Mode */
+body.dark .nav-row { background: #1e1e1e; }
+body.dark .nav-btn-sm { background: #333; color: #52c41a; }
+body.dark #dayLabel { color: #eee; }
+    
     body {
       font-family: 'Segoe UI', sans-serif;
       max-width: 600px;
@@ -228,18 +457,27 @@ select {
 
 <button id="darkModeBtn">🌙 Dark Mode</button>
 
-<div class="card">
+<div class="project-header">
   <select id="projectSelect"></select>
-  <button id="renameProject">Rename</button>
-  <button id="deleteProject" class="danger">Delete</button><br>
-  <input id="newProject" placeholder="Project baru">
-  <button id="addProject" class="primary">Tambah</button>
+  
+  <button id="renameProject" class="icon-btn btn-rename" title="Rename">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+  </button>
+  
+  <button id="deleteProject" class="icon-btn btn-delete" title="Delete">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+  </button>
 </div>
 
-<div class="card">
-  <button id="prevDay">◀</button>
+<div class="project-header" style="box-shadow:none; background:transparent; padding:0;">
+  <input id="newProject" placeholder="Project baru..." style="flex-grow:1; margin-right:8px;">
+  <button id="addProject" class="primary" style="width:auto; margin:0;">Tambah</button>
+</div>
+
+<div class="nav-row">
+  <button id="prevDay" class="nav-btn-sm">◀</button>
   <span id="dayLabel"></span>
-  <button id="nextDay">▶</button>
+  <button id="nextDay" class="nav-btn-sm">▶</button>
 </div>
 
 <div class="card">
@@ -389,34 +627,153 @@ function updateProgress(){
     percent>=80 ? "🔥 Target tercapai!" : "💪 Kejar 80%";
 }
 
-function updateChart(){
+function updateChart() {
   let list = activitiesPerProject[currentProject] || [];
   let data = [];
 
-  for(let d=1; d<=7; d++){
-    let done=0;
-
-    list.forEach(a=>{
-      if(savedData[`${currentProject}-${d}-${a}`]) done++;
+  for (let d = 1; d <= 7; d++) {
+    let done = 0;
+    list.forEach(a => {
+      if (savedData[`${currentProject}-${d}-${a}`]) done++;
     });
-
-    let percent = list.length ? Math.round(done/list.length*100) : 0;
+    let percent = list.length ? Math.round((done / list.length) * 100) : 0;
     data.push(percent);
   }
 
-  if(chart) chart.destroy();
+  // --- Mulai Pembuatan Grafik yang Lebih Estetik ---
+  if (chart) chart.destroy();
 
-  chart = new Chart(document.getElementById('progressChart'), {
+  const ctx = document.getElementById('progressChart').getContext('2d');
+
+  // 1. Membuat Warna Gradien di bawah garis (Gradient Area)
+  let gradient = ctx.createLinearGradient(0, 0, 0, 250); // x0, y0, x1, y1 (Arah atas ke bawah)
+  gradient.addColorStop(0, 'rgba(76, 175, 80, 0.4)'); // Warna atas (Lebih terang)
+  gradient.addColorStop(1, 'rgba(76, 175, 80, 0.0)'); // Warna bawah (Transparan penuh)
+
+  // 2. Mendefinisikan Warna Garis Utama
+  const lineColor = "#4CAF50"; // Warna Hijau Segar
+
+  chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ["D1","D2","D3","D4","D5","D6","D7"],
+      labels: ["D1", "D2", "D3", "D4", "D5", "D6", "D7"],
       datasets: [{
-        label: currentProject,
+        label: currentProject, // Judul grafik di Legend
         data: data,
-        borderColor: "#4CAF50",
-        backgroundColor: "#4CAF50",
-        tension: 0.3
+        
+        // --- ESTETIKA GARIS & AREA ---
+        borderColor: lineColor, // Warna Garis Utama
+        backgroundColor: gradient, // Warna Area di bawah garis (Menggunakan Gradien)
+        fill: true, // WAJIB: Aktifkan pengisian area
+        tension: 0.45, // Membuat garis melengkung lembut (Smooth Line)
+        borderWidth: 3, // Membuat garis sedikit lebih tebal
+        capBezierPoints: true, // Memastikan lekukan bersih
+
+        // --- ESTETIKA TITIK (POINTS) ---
+        pointBackgroundColor: "white", // Warna dalam titik
+        pointBorderColor: lineColor, // Warna pinggiran titik
+        pointBorderWidth: 3, // Pinggiran titik lebih tebal
+        pointRadius: 6, // Ukuran titik saat diam
+        pointHoverRadius: 9, // Ukuran titik saat di-hover (Lebih Besar)
+        pointHoverBackgroundColor: lineColor, // Titik penuh warna saat di-hover
+        pointHoverBorderColor: "white", // Pinggiran putih saat di-hover
+        pointHoverBorderWidth: 3,
+        pointHitRadius: 10, // Mempermudah user mengenai titik saat di-hover
       }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false, // Memungkinkan grafik menyesuaikan lebar kontainer
+      
+      // --- ESTETIKA ANIMASI ---
+      animation: {
+        duration: 1500, // Membuat durasi animasi lebih lama dan halus
+        easing: 'easeOutQuart' // Jenis efek animasi yang elegan
+      },
+
+      // --- ESTETIKA ELEMEN GRAFIK (LEGEND, TOOLTIP) ---
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top', // Posisi legend di atas
+          labels: {
+            usePointStyle: true, // Legend menggunakan gaya titik (bulat), bukan kotak
+            pointStyle: 'circle',
+            padding: 20, // Jarak legend ke grafik
+            font: {
+              family: "'Segoe UI', sans-serif",
+              size: 14,
+              weight: 'bold'
+            },
+            color: '#333'
+          }
+        },
+        tooltip: {
+          // Kustomisasi kotak tooltip saat di-hover
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          titleColor: lineColor,
+          bodyColor: '#555',
+          bodyFont: { size: 14 },
+          borderColor: lineColor,
+          borderWidth: 1,
+          padding: 12,
+          displayColors: false, // Tidak menampilkan kotak warna legend kecil
+          callbacks: {
+            label: function(context) {
+              return context.parsed.y + '% Progress'; // Mengubah teks "Ketiga: X" menjadi "X% Progress"
+            }
+          }
+        }
+      },
+
+      // --- ESTETIKA SUMBU (SCALES) ---
+      scales: {
+        y: {
+          beginAtZero: true,
+          max: 100, // Memastikan skala vertikal selalu 0-100%
+          title: {
+            display: true,
+            text: 'Persentase (%)',
+            font: {
+              family: "'Segoe UI', sans-serif",
+              size: 13,
+              weight: 'bold'
+            },
+            color: '#777'
+          },
+          grid: {
+            // Membuat garis kisi horisontal lebih tipis dan pudar
+            color: 'rgba(0,0,0,0.04)',
+            borderColor: 'rgba(0,0,0,0.08)'
+          },
+          ticks: {
+            // Memberikan simbol '%' pada angka di sumbu Y
+            callback: function(value) {
+              return value + "%";
+            },
+            color: '#888'
+          }
+        },
+        x: {
+          title: {
+            display: true,
+            text: 'Hari (Siklus Mingguan)',
+            font: {
+              family: "'Segoe UI', sans-serif",
+              size: 13,
+              weight: 'bold'
+            },
+            color: '#777'
+          },
+          grid: {
+            display: false, // Menghilangkan garis kisi vertikal agar lebih bersih
+            borderColor: 'rgba(0,0,0,0.08)'
+          },
+          ticks: {
+            color: '#888'
+          }
+        }
+      }
     }
   });
 }
