@@ -497,13 +497,17 @@ projectSelect.onchange=()=>{
 document.getElementById('addActivity').onclick=()=>{
   let val=newActivity.value.trim();
 
-  if(val && !activitiesPerProject[currentProject].includes(val)){
+  if(val){
+    if(activitiesPerProject[currentProject].includes(val)){
+      alert("Aktivitas sudah ada!");
+      return;
+    }
+
     activitiesPerProject[currentProject].push(val);
     saveAll();
     renderDay();
   }
 };
-
 prevDay.onclick=()=>{
   currentDay=(currentDay-2+7)%7+1;
   localStorage.setItem('currentDay',currentDay);
