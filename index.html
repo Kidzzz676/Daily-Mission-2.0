@@ -8,65 +8,49 @@
 
   <style>
     
-    /* Container Menu Utama */
-.card-menu {
+    /* Container Menu Utama - Mengubah jadi 2 Kolom */
+.card-menu-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Membagi menjadi 2 kolom agar lebih ringkas */
+  grid-template-columns: 1fr 1fr; 
   gap: 12px;
-  background: rgba(255, 255, 255, 0.4) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 24px;
-  padding: 20px;
+  margin-top: 10px;
 }
 
-/* Base Style Tombol Menu */
-.menu-btn {
+/* Style Tombol Menu Kotak (Square) */
+.menu-btn-item {
   display: flex;
-  flex-direction: column; /* Ikon di atas, teks di bawah */
+  flex-direction: column; 
   align-items: center;
   justify-content: center;
-  padding: 15px;
-  border-radius: 18px;
+  padding: 20px 10px;
+  border-radius: 20px;
   border: none;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #444;
   background: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-/* Efek Hover: Tombol sedikit membesar dan bercahaya */
-.menu-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08);
-  background: #fdfdfd;
-}
-
-/* Memberikan warna ikon yang berbeda secara halus */
-.menu-btn i {
+/* Warna Ikon & Teks Spesifik */
+.menu-btn-item i {
   font-size: 24px;
   margin-bottom: 8px;
 }
 
-/* Tombol Reset (Warna Merah Halus) */
-#resetLog {
-  background: #fff1f0;
-  color: #ff4d4f;
-}
+.btn-dash { color: #52c41a; background: #f6ffed; }
+.btn-week { color: #1890ff; background: #e6f7ff; }
+.btn-export { color: #722ed1; background: #f9f0ff; }
+.btn-reset { color: #ff4d4f; background: #fff1f0; }
 
-#resetLog:hover {
-  background: #ff4d4f;
-  color: white;
+/* Dark Mode Adjustment */
+body.dark .menu-btn-item {
+  background: #1e1e1e;
+  color: #ddd;
 }
-
-/* Tombol Dashboard (Warna Hijau/Biru) */
-#showDashboard {
-  background: #f6ffed;
-  color: #52c41a;
-}
+    
+    
     
     :root {
   --primary-glow: #52c41a;
@@ -420,10 +404,6 @@ button:hover {
 
 /* ===== TAMBAHKAN DI SINI ===== */
 
-select, input[type="text"], button {
-  width: 100%;
-  box-sizing: border-box;
-}
 
 select, input {
   height: 38px;
@@ -432,9 +412,6 @@ select, input {
   border: 1px solid #ddd;
 }
 
-button {
-  height: 38px;
-}
 
 select {
   appearance: none;
@@ -519,11 +496,26 @@ select {
   <canvas id="progressChart"></canvas>
 </div>
 
-<div class="card">
-  <button id="showDashboard">📊 Dashboard</button>
-  <button id="newWeek">🆕 New Week</button>
-  <button id="resetLog">Reset</button>
-  <button id="exportCSV">📥 Export CSV</button>
+<div class="card-menu-grid">
+  <button id="showDashboard" class="menu-btn-item btn-dash">
+    <i>📊</i>
+    Dashboard
+  </button>
+  
+  <button id="newWeek" class="menu-btn-item btn-week">
+    <i>📅</i>
+    New Week
+  </button>
+  
+  <button id="exportCSV" class="menu-btn-item btn-export">
+    <i>📥</i>
+    Export Data
+  </button>
+  
+  <button id="resetLog" class="menu-btn-item btn-reset">
+    <i>🔄</i>
+    Reset All
+  </button>
 </div>
 
 <div id="weeklyContainer" style="display:none;"></div>
@@ -942,16 +934,35 @@ document.getElementById('exportCSV').onclick=()=>{
   link.click();
 };
 
-document.getElementById('addProject').onclick=()=>{
-  let val=newProject.value.trim();
-  if(val&&!projects.includes(val)){
-    projects.push(val);
-    currentProject=val;
-    activitiesPerProject[val]=[];
-    saveAll();
-    renderProjects();
-    renderDay();
+document.getElementById('addProject').onclick = () => {
+  let val = newProject.value.trim();
+  
+  // 1. Cek apakah input kosong
+  if (!val) {
+    alert("Nama project tidak boleh kosong!");
+    return;
   }
+
+  // 2. Cek apakah nama project sudah ada (Case Insensitive agar 'Kerja' & 'kerja' dianggap sama)
+  let isDuplicate = projects.some(p => p.toLowerCase() === val.toLowerCase());
+
+  if (isDuplicate) {
+    alert(`Project dengan nama "${val}" sudah ada!`);
+    newProject.value = ""; // Bersihkan input
+    return;
+  }
+
+  // 3. Jika aman, baru tambahkan
+  projects.push(val);
+  currentProject = val;
+  activitiesPerProject[val] = [];
+  
+  saveAll();
+  renderProjects();
+  renderDay();
+  
+  newProject.value = ""; // Bersihkan input setelah berhasil
+  alert("Project berhasil ditambahkan!");
 };
 
 projectSelect.onchange=()=>{
@@ -1027,12 +1038,18 @@ document.getElementById('cancelRename').onclick = () => {
 document.getElementById('confirmRename').onclick = () => {
   let newName = renameInput.value.trim();
 
-  if (!newName || newName === currentProject) return;
-
-  if (projects.includes(newName)) {
-    alert("Nama project sudah ada!");
+  if (!newName || newName === currentProject) {
+    modal.style.display = "none";
     return;
   }
+
+  // Cek duplicate saat ganti nama
+  if (projects.some(p => p.toLowerCase() === newName.toLowerCase())) {
+    alert("Nama project tersebut sudah digunakan!");
+    return;
+  }
+
+  // ... sisa kode rename kamu selanjutnya ...
 
   // 🔁 logic rename (tetap sama)
   projects = projects.map(p => p === currentProject ? newName : p);
