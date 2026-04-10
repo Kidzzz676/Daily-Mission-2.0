@@ -29,13 +29,25 @@
       flex-direction: column;
     }
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 8px 12px;
-      margin: 3px;
-      cursor: pointer;
-    }
+   button {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin: 3px;
+  cursor: pointer;
+
+  /* ✨ tambahan baru */
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+button:active {
+  transform: scale(0.97);
+}
+
+button:hover {
+  opacity: 0.9;
+}
 
     .card button {
       margin-top: 5px;
