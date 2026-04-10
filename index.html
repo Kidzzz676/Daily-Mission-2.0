@@ -297,20 +297,31 @@ button:hover {
 
     .activity label { margin-left: 10px; }
 
-    .activity .delete-btn {
-      margin-left: auto;
-      background: transparent;
-      color: #ff4d4f;
-      border: none;
-      font-size: 14px;
-      padding: 2px 6px;
-      opacity: 0;
-      transition: 0.2s;
-    }
+    /* Tombol Delete Minimalis */
+.activity .delete-btn {
+  opacity: 1 !important; /* Pastikan selalu muncul di HP */
+  background: transparent !important;
+  color: #ff4d4f !important;
+  border: none !important;
+  font-size: 18px !important;
+  padding: 5px !important;
+  width: 32px !important; /* Ukuran tetap kecil */
+  height: 32px !important;
+  margin: 0 !important;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none !important; /* Hilangkan bayangan tombol standar */
+  transform: none !important; /* Hilangkan efek hover standar */
+}
 
-    .activity:hover .delete-btn {
-      opacity: 1;
-    }
+/* Efek saat ditekan agar terasa kliknya */
+.activity .delete-btn:active {
+  transform: scale(0.8) !important;
+  background: rgba(255, 77, 79, 0.1) !important;
+  border-radius: 50%;
+}
 
     .progress-container {
       height: 20px;
@@ -444,10 +455,20 @@ select {
         font-size: 15px;
       }
 
-      .activity {
-        padding: 10px;
-        font-size: 16px;
-      }
+     /* Container aktivitas */
+.activity {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  gap: 10px;
+}
+
+/* Label aktivitas agar teks tidak terpotong */
+.activity label {
+  flex-grow: 1;
+  font-size: 14px;
+}
     }
   </style>
 </head>
@@ -593,11 +614,12 @@ function renderDay(){
     del.textContent="✖";
     del.className="delete-btn";
     del.onclick=()=>{
-      activitiesPerProject[currentProject] =
-        list.filter(a=>a!==act);
-      saveAll();
-      renderDay();
-    };
+  if(confirm(`Hapus aktivitas "${act}"?`)) { // Konfirmasi muncul di sini
+    activitiesPerProject[currentProject] = list.filter(a=>a!==act);
+    saveAll();
+    renderDay();
+  }
+};
 
     div.append(cb,label,del);
     activitiesDiv.appendChild(div);
